@@ -12,6 +12,14 @@ interface City {
 }
 
 export class CapitalCityScraper {
+	readonly startUrl = "https://en.wikipedia.org/wiki/List_of_European_countries_by_area";
+
+	async *scrape() {
+		for await (let url of this.crawlCountries(this.startUrl)) {
+			yield await this.scrapeCity(url);
+		}
+	}
+
 	async *crawlCountries(url: string) {
 		const response = await axios.get(url);
 		const html = response.data;
@@ -124,8 +132,9 @@ export class CapitalCityScraper {
 
 async function main() {
 	const scraper = new CapitalCityScraper();
-	for await (let url of scraper.crawlCountries("https://en.wikipedia.org/wiki/List_of_European_countries_by_area")) {
-		console.log(await scraper.scrapeCity(url));
+
+	for await (let city of scraper.scrape()) {
+		console.log(city);
 	}
 }
 
