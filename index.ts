@@ -23,8 +23,38 @@ export class CapitalCityScraper {
 		for (let link of links) {
 			const href = $(link).attr('href')!;
 			const countryPageUrl = new URL(href, url).toString();
-			console.log(countryPageUrl);
+			const capitalCityPageUrl = await this.crawlCountry(countryPageUrl);
+
+			if (capitalCityPageUrl) {
+				console.log(capitalCityPageUrl);
+			}
 		}
+	}
+
+	async crawlCountry(url: string) {
+		const response = await axios.get(url);
+		const html = response.data;
+
+		const $ = cheerio.load(html);
+
+		const capitalCityRow = $('.infobox th:contains(Capital)').parent();
+
+		if (capitalCityRow.length === 0) {
+			// city state is capitaly city itself
+			return url;
+		}
+
+		const capitalCityLink = capitalCityRow.find('td > a').attr('href');
+
+		if (!capitalCityLink) {
+			// in some cases the capital city cannot be scraped
+			// (possible, but too complicated for this article)
+			return undefined;
+		}
+
+		const capitalCityUrl = new URL(capitalCityLink, url).toString();
+
+		return capitalCityUrl;
 	}
 
 	async scrapeCity(url: string) {
