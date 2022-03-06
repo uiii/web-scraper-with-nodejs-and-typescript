@@ -12,7 +12,7 @@ interface City {
 }
 
 export class CapitalCityScraper {
-	async crawlCountries(url: string) {
+	async *crawlCountries(url: string) {
 		const response = await axios.get(url);
 		const html = response.data;
 
@@ -20,19 +20,15 @@ export class CapitalCityScraper {
 
 		const links = $('.wikitable td:nth-child(2) > a').get();
 
-		const urls: string[] = [];
-
 		for (let link of links) {
 			const href = $(link).attr('href')!;
 			const countryPageUrl = new URL(href, url).toString();
 			const capitalCityPageUrl = await this.crawlCountry(countryPageUrl);
 
 			if (capitalCityPageUrl) {
-				urls.push(capitalCityPageUrl);
+				yield capitalCityPageUrl;
 			}
 		}
-
-		return urls;
 	}
 
 	async crawlCountry(url: string) {
@@ -124,7 +120,7 @@ export class CapitalCityScraper {
 
 async function main() {
 	const scraper = new CapitalCityScraper();
-	for (let url of await scraper.crawlCountries("https://en.wikipedia.org/wiki/List_of_European_countries_by_area")) {
+	for await (let url of scraper.crawlCountries("https://en.wikipedia.org/wiki/List_of_European_countries_by_area")) {
 		console.log(url);
 	}
 }
