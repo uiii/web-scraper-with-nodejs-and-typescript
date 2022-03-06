@@ -3,6 +3,14 @@ import path from 'path';
 import axios from 'axios';
 import cheerio from 'cheerio';
 
+interface City {
+	name: string;
+	country: string;
+	area: number;
+	population: number;
+	flagImagePath: string;
+}
+
 export class CapitalCityScraper {
 	async scrapeCity(url: string) {
 		const response = await axios.get(url);
@@ -11,25 +19,30 @@ export class CapitalCityScraper {
 		const $ = cheerio.load(html);
 
 		const cityName = $('#firstHeading').text().trim();
-		console.log(cityName);
 
 		const country = $('.mergedtoprow th:contains(Country) + td').text().trim();
-		console.log(country);
 
 		const areaRows = $('.mergedtoprow th:contains(Area)').parent().nextUntil('.mergedtoprow');
 		const areaText = areaRows.find('th:contains(Capital city) + td').text().trim().replace(/ km2.*$/, '');
 		const area = parseFloat(areaText.replace(/,/g, ''));
-		console.log(area);
 
 		const populationRows = $('.mergedtoprow th:contains(Population)').parent().nextUntil('.mergedtoprow');
 		const populationText = populationRows.find('th:contains(Capital city) + td').text().trim();
 		const population = parseFloat(populationText.replace(/,/g, ''));
-		console.log(population);
 
 		const flagPageLink = $('.mergedtoprow a.image + div:contains(Flag)').prev().attr('href')!;
 		const flagPageUrl = new URL(flagPageLink, url).toString();
 		const flagImagePath = await this.scrapeImage(flagPageUrl);
-		console.log(flagImagePath);
+
+		const city: City = {
+			name: cityName,
+			country,
+			area,
+			population,
+			flagImagePath
+		};
+
+		return city;
 	}
 
 	protected async scrapeImage(url: string) {
@@ -62,7 +75,8 @@ export class CapitalCityScraper {
 
 async function main() {
 	const scraper = new CapitalCityScraper();
-	await scraper.scrapeCity("https://en.wikipedia.org/wiki/Prague");
+	const city = await scraper.scrapeCity("https://en.wikipedia.org/wiki/Prague");
+	console.log(city);
 }
 
 main();
