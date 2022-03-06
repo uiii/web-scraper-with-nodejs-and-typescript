@@ -13,6 +13,14 @@ export class CapitalCityScraper {
 
 		const country = $('.mergedtoprow th:contains(Country) + td').text().trim();
 		console.log(country);
+
+		const areaRows = $('.mergedtoprow th:contains(Area)').parent().nextUntil('.mergedtoprow');
+		const area = areaRows.find('th:contains(Capital city) + td').text().trim();
+		console.log(area);
+
+		const populationRows = $('.mergedtoprow th:contains(Population)').parent().nextUntil('.mergedtoprow');
+		const population = populationRows.find('th:contains(Capital city) + td').text().trim();
+		console.log(population);
 	}
 }
 
