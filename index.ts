@@ -10,6 +10,9 @@ export class CapitalCityScraper {
 
 		const cityName = $('#firstHeading').text().trim();
 		console.log(cityName);
+
+		const country = $('.mergedtoprow th:contains(Country) + td').text().trim();
+		console.log(country);
 	}
 }
 
