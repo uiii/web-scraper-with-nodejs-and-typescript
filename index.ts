@@ -15,11 +15,13 @@ export class CapitalCityScraper {
 		console.log(country);
 
 		const areaRows = $('.mergedtoprow th:contains(Area)').parent().nextUntil('.mergedtoprow');
-		const area = areaRows.find('th:contains(Capital city) + td').text().trim();
+		const areaText = areaRows.find('th:contains(Capital city) + td').text().trim().replace(/ km2.*$/, '');
+		const area = parseFloat(areaText.replace(/,/g, ''));
 		console.log(area);
 
 		const populationRows = $('.mergedtoprow th:contains(Population)').parent().nextUntil('.mergedtoprow');
-		const population = populationRows.find('th:contains(Capital city) + td').text().trim();
+		const populationText = populationRows.find('th:contains(Capital city) + td').text().trim();
+		const population = parseFloat(populationText.replace(/,/g, ''));
 		console.log(population);
 	}
 }
