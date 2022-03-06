@@ -20,15 +20,19 @@ export class CapitalCityScraper {
 
 		const links = $('.wikitable td:nth-child(2) > a').get();
 
+		const urls: string[] = [];
+
 		for (let link of links) {
 			const href = $(link).attr('href')!;
 			const countryPageUrl = new URL(href, url).toString();
 			const capitalCityPageUrl = await this.crawlCountry(countryPageUrl);
 
 			if (capitalCityPageUrl) {
-				console.log(capitalCityPageUrl);
+				urls.push(capitalCityPageUrl);
 			}
 		}
+
+		return urls;
 	}
 
 	async crawlCountry(url: string) {
@@ -120,7 +124,9 @@ export class CapitalCityScraper {
 
 async function main() {
 	const scraper = new CapitalCityScraper();
-	await scraper.crawlCountries("https://en.wikipedia.org/wiki/List_of_European_countries_by_area");
+	for (let url of await scraper.crawlCountries("https://en.wikipedia.org/wiki/List_of_European_countries_by_area")) {
+		console.log(url);
+	}
 }
 
 main();
