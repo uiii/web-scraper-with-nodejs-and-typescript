@@ -12,6 +12,21 @@ interface City {
 }
 
 export class CapitalCityScraper {
+	async crawlCountries(url: string) {
+		const response = await axios.get(url);
+		const html = response.data;
+
+		const $ = cheerio.load(html);
+
+		const links = $('.wikitable td:nth-child(2) > a').get();
+
+		for (let link of links) {
+			const href = $(link).attr('href')!;
+			const countryPageUrl = new URL(href, url).toString();
+			console.log(countryPageUrl);
+		}
+	}
+
 	async scrapeCity(url: string) {
 		const response = await axios.get(url);
 		const html = response.data;
@@ -75,8 +90,7 @@ export class CapitalCityScraper {
 
 async function main() {
 	const scraper = new CapitalCityScraper();
-	const city = await scraper.scrapeCity("https://en.wikipedia.org/wiki/Prague");
-	console.log(city);
+	await scraper.crawlCountries("https://en.wikipedia.org/wiki/List_of_European_countries_by_area");
 }
 
 main();
