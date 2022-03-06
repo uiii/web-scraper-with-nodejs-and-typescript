@@ -121,7 +121,7 @@ export class CapitalCityScraper {
 async function main() {
 	const scraper = new CapitalCityScraper();
 	for await (let url of scraper.crawlCountries("https://en.wikipedia.org/wiki/List_of_European_countries_by_area")) {
-		console.log(url);
+		console.log(await scraper.scrapeCity(url));
 	}
 }
 
